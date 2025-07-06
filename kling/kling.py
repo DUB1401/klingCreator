@@ -427,7 +427,9 @@ class ImageGen(BaseGen):
         prompt: str,
         image_path: Optional[str] = None,
         image_url: Optional[str] = None,
+        ratio: Optional[str] = None,
     ) -> list:
+        if ratio not in ("1:1", "16:9", "4:3", "3:2", "2:3", "3:4", "9:16", "21:9", None): raise ValueError(f"Unsupported ratio \"{ratio}\".")
         self.session.headers["user-agent"] = ua.random
         if image_path or image_url:
             if image_path:
@@ -443,7 +445,7 @@ class ImageGen(BaseGen):
                     },
                     {
                         "name": "aspect_ratio",
-                        "value": "1:1",
+                        "value": ratio or "1:1",
                     },
                     {
                         "name": "imageCount",
