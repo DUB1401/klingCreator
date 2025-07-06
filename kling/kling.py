@@ -207,6 +207,16 @@ class VideoGen(BaseGen):
         }
         return self._get_video_with_payload(payload)
 
+    def fetch_video_url(self, work_id: str, session: requests.Session):
+        url = f"{self.base_url}api/works/batch_download_v2?workIds={work_id}"
+        response = session.get(url)
+        data = response.json().get("data")
+        assert data is not None
+        if data.get("status") == "success":
+            return data["cdnUrl"], TaskStatus.COMPLETED
+        else:
+            return data, TaskStatus.PENDING
+
     def _get_video_with_payload(self, payload: dict) -> list:
         response = self.session.post(
             self.submit_url,
@@ -246,7 +256,14 @@ class VideoGen(BaseGen):
                     return []
                 else:
                     for work in works:
+                        work: dict
                         resource = work.get("resource", {}).get("resource")
+
+                        # if workId exists fetch resource without watermark (for pytest passing)
+                        if "workId" in work.keys():
+                            work_id = work["workId"]
+                            resource, _ = self.fetch_video_url(work_id, session=self.session)
+                        
                         if resource:
                             # sleep for 2s for waiting the video to be ready in kuaishou server
                             time.sleep(2)
