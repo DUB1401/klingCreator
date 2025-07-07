@@ -262,8 +262,10 @@ class VideoGen(BaseGen):
                         # if workId exists fetch resource without watermark (for pytest passing)
                         if "workId" in work.keys():
                             work_id = work["workId"]
-                            resource, _ = self.fetch_video_url(work_id, session=self.session)
-                        
+                            resource, _ = self.fetch_video_url(
+                                work_id, session=self.session
+                            )
+
                         if resource:
                             # sleep for 2s for waiting the video to be ready in kuaishou server
                             time.sleep(2)
@@ -429,7 +431,18 @@ class ImageGen(BaseGen):
         image_url: Optional[str] = None,
         ratio: Optional[str] = None,
     ) -> list:
-        if ratio not in ("1:1", "16:9", "4:3", "3:2", "2:3", "3:4", "9:16", "21:9", None): raise ValueError(f"Unsupported ratio \"{ratio}\".")
+        if ratio not in (
+            "1:1",
+            "16:9",
+            "4:3",
+            "3:2",
+            "2:3",
+            "3:4",
+            "9:16",
+            "21:9",
+            None,
+        ):
+            raise ValueError(f'Unsupported ratio "{ratio}".')
         self.session.headers["user-agent"] = ua.random
         if image_path or image_url:
             if image_path:
